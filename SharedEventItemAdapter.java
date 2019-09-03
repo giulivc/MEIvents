@@ -33,8 +33,8 @@ public class SharedEventItemAdapter extends ArrayAdapter<SharedEventItem> {
         SharedEventItem sharedEventItem = sharedEventList.get(position);
 
         if (sharedEventItem != null) {
-            TextView sharedEventItemTitle = v.findViewById(R.id.titleTextView);
-            TextView sharedEventItemDate = v.findViewById(R.id.dateTextView);
+            TextView sharedEventItemTitle = v.findViewById(R.id.title_info_textView);
+            TextView sharedEventItemDate = v.findViewById(R.id.date_textView);
 
             sharedEventItemTitle.setText(sharedEventItem.getTitle());
             sharedEventItemDate.setText(sharedEventItem.getDate());

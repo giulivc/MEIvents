@@ -2,7 +2,10 @@ package com.example.meivents;
 
 public class Constants {
 
-    static final int WAITING = 0;
-    static final int ACCEPTED = 1;
-    static final int DECLINED = 2;
+    static final String ACCESS_CODE = "219912";
+
+
+    static final String WAITING = "0";
+    static final String ACCEPTED = "1";
+    static final String DECLINED = "2";
 }

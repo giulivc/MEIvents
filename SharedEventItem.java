@@ -5,18 +5,21 @@ import android.widget.ImageView;
 
 public class SharedEventItem {
 
-    private String title;
-    private String date;
-    private int status;
+    private String id, title, date, status;
 
     ImageView imageView;
 
-    public SharedEventItem(String title, String date, int status){
+    public SharedEventItem(String id, String title, String date, String status){
+        this.id = id;
         this.title = title;
         this.date = date;
         this.status = status;
     }
 
+
+    public String getId() {
+        return id;
+    }
 
     public String getTitle() {
         return title;
@@ -26,21 +29,21 @@ public class SharedEventItem {
         return date;
     }
 
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public void setImage(View v, int status){
-        imageView = v.findViewById(R.id.statusImageView);
-        if(status == Constants.WAITING) {
+    public void setImage(View v, String status){
+        imageView = v.findViewById(R.id.status_imageView);
+        if(status.equals(Constants.WAITING)) {
             imageView.setImageResource(R.drawable.ic_status_waiting);
-        } else if(status == Constants.ACCEPTED){
+        } else if(status.equals(Constants.ACCEPTED)){
             imageView.setImageResource(R.drawable.ic_status_accepted);
-        } else if(status == Constants.DECLINED){
+        } else if(status.equals(Constants.DECLINED)){
             imageView.setImageResource(R.drawable.ic_status_declined);
         }
 

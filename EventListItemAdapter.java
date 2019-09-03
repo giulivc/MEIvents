@@ -9,12 +9,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class EventItemAdapter extends ArrayAdapter<EventItem> {
+public class EventListItemAdapter extends ArrayAdapter<EventListItem> {
 
-    private ArrayList<EventItem> eventList;
+    private ArrayList<EventListItem> eventList;
     private Context context;
 
-    public EventItemAdapter(Context context, ArrayList<EventItem> eventList) {
+    public EventListItemAdapter(Context context, ArrayList<EventListItem> eventList) {
         super(context, R.layout.event_list_item, eventList);
 
         this.eventList = eventList;
@@ -30,14 +30,14 @@ public class EventItemAdapter extends ArrayAdapter<EventItem> {
             v = layoutInflater.inflate(R.layout.event_list_item, null);
         }
 
-        EventItem eventItem = eventList.get(position);
+        EventListItem eventListItem = eventList.get(position);
 
-        if (eventItem != null) {
-            TextView eventItemTitle = v.findViewById(R.id.titleTextView);
-            TextView eventItemDate = v.findViewById(R.id.dateTextView);
+        if (eventListItem != null) {
+            TextView eventItemTitle = v.findViewById(R.id.title_info_textView);
+            TextView eventItemDate = v.findViewById(R.id.date_textView);
 
-            eventItemTitle.setText(eventItem.getTitle());
-            eventItemDate.setText(eventItem.getDate());
+            eventItemTitle.setText(eventListItem.getTitle());
+            eventItemDate.setText(eventListItem.getDate());
         }
         return v;
     }

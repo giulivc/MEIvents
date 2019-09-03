@@ -5,13 +5,13 @@ import java.text.ParseException;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-public class EventItem {
+public class EventListItem {
 
     private String title;
     //private GregorianCalendar date;
     private String date;
 
-    public EventItem(String title, String date) {
+    public EventListItem(String title, String date) {
         this.title = title;
         //this.date = getDateFromString(date);
         this.date = date;
