@@ -3,7 +3,6 @@ package com.example.meivents;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
@@ -13,20 +12,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.security.Key;
-
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LoginFragment extends Fragment implements View.OnClickListener, View.OnKeyListener {
+public class StudentCouncilLoginFragment extends Fragment implements View.OnClickListener, View.OnKeyListener {
 
 
     Button codeConfirmButton;
@@ -43,7 +39,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_login, container, false);
+        View view = inflater.inflate(R.layout.fragment_student_council_login, container, false);
 
         codeConfirmButton = view.findViewById(R.id.codeConfirmButton);
         codeConfirmButton.setOnClickListener(this);

@@ -9,12 +9,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class SharedEventItemAdapter extends ArrayAdapter<SharedEventItem> {
+public class SharedEventListItemAdapter extends ArrayAdapter<SharedEventListItem> {
 
-    private ArrayList<SharedEventItem> sharedEventList;
+    private ArrayList<SharedEventListItem> sharedEventList;
     private Context context;
 
-    public SharedEventItemAdapter(Context context, ArrayList<SharedEventItem> sharedEventList) {
+    public SharedEventListItemAdapter(Context context, ArrayList<SharedEventListItem> sharedEventList) {
         super(context, R.layout.shared_event_list_item, sharedEventList);
 
         this.sharedEventList = sharedEventList;
@@ -30,15 +30,15 @@ public class SharedEventItemAdapter extends ArrayAdapter<SharedEventItem> {
             v = layoutInflater.inflate(R.layout.shared_event_list_item, null);
         }
 
-        SharedEventItem sharedEventItem = sharedEventList.get(position);
+        SharedEventListItem sharedEventListItem = sharedEventList.get(position);
 
-        if (sharedEventItem != null) {
+        if (sharedEventListItem != null) {
             TextView sharedEventItemTitle = v.findViewById(R.id.title_info_textView);
             TextView sharedEventItemDate = v.findViewById(R.id.date_textView);
 
-            sharedEventItemTitle.setText(sharedEventItem.getTitle());
-            sharedEventItemDate.setText(sharedEventItem.getDate());
-            sharedEventItem.setImage(v, sharedEventItem.getStatus());
+            sharedEventItemTitle.setText(sharedEventListItem.getTitle());
+            sharedEventItemDate.setText(sharedEventListItem.getDate());
+            sharedEventListItem.setImage(v);
         }
         return v;
     }

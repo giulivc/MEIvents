@@ -31,9 +31,9 @@ import java.util.ArrayList;
 
 public class SharedEventsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-    ArrayList<SharedEventItem> sharedEventList;
+    ArrayList<SharedEventListItem> sharedEventList;
     ListView sharedEventsListView;
-    SharedEventItemAdapter adapter;
+    SharedEventListItemAdapter adapter;
 
     FirebaseDatabase firebaseDatabase;
     FirebaseAuth firebaseAuth;
@@ -58,7 +58,7 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
         sharedEventList = new ArrayList<>();
         sharedEventsListView = view.findViewById(R.id.sharedEventsListView);
         sharedEventsListView.setOnItemClickListener(this);
-        adapter = new SharedEventItemAdapter(getContext(), sharedEventList);
+        adapter = new SharedEventListItemAdapter(getContext(), sharedEventList);
         sharedEventsListView.setAdapter(adapter);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -71,8 +71,8 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Event event = dataSnapshot.getValue(Event.class);
                 if(event != null){
-                    SharedEventItem newSharedEventItem = event.getSharedEventListItemFromEvent(event);
-                    sharedEventList.add(newSharedEventItem);
+                    SharedEventListItem newSharedEventListItem = event.getSharedEventListItemFromEvent(event);
+                    sharedEventList.add(newSharedEventListItem);
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -110,9 +110,9 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        SharedEventItem sharedEventItem = sharedEventList.get(position);
+        SharedEventListItem sharedEventListItem = sharedEventList.get(position);
         sharedEventsRef = firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("Shared Events");
-        Query query = sharedEventsRef.orderByChild("id").equalTo(sharedEventItem.getId());
+        Query query = sharedEventsRef.orderByChild("eventId").equalTo(sharedEventListItem.getEventId());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -120,14 +120,14 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Event event = snapshot.getValue(Event.class);
 
-                        System.out.println(event);
-                        Intent intent = new Intent(getActivity(), EventInfoActivity.class);
+                        Intent intent = new Intent(getActivity(), SharedEventInfoActivity.class);
+                        intent.putExtra("ID", event.getEventId());
                         intent.putExtra("TITLE", event.getTitle());
                         intent.putExtra("DATE", event.getDate());
                         intent.putExtra("TIME", event.getTime());
                         intent.putExtra("PLACE", event.getPlace());
                         intent.putExtra("DESCR", event.getDescription());
-                        intent.putExtra("ID", event.getId());
+                        intent.putExtra("STATUS", event.getStatus());
                         startActivity(intent);
                     }
                 }

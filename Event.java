@@ -1,22 +1,20 @@
 package com.example.meivents;
 
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-
 public class Event {
 
-    String id, title, date, time, place, admission, description, status;
+    String eventId, title, date, time, place, admission, description, status, userId;
     Boolean reminderOn;
+
+    Boolean done;
 
     public Event(){
 
     }
 
-    public Event (String id,String title, String date, String time, String place, String admission, String description, String status, Boolean reminderOn){
-        this.id = id;
+    public Event (String userId, String eventId, String title, String date, String time, String place, String admission, String description, String status){
+        this.userId = userId;
+        this.eventId = eventId;
         this.title = title;
         this.date = date;
         this.time = time;
@@ -24,13 +22,16 @@ public class Event {
         this.admission = admission;
         this.description = description;
         this.status = status;
-        this.reminderOn = reminderOn;
 
 
     }
 
-    public String getId() {
-        return id;
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getEventId() {
+        return eventId;
     }
 
     public String getTitle() {
@@ -61,22 +62,35 @@ public class Event {
         return description;
     }
 
-    public Boolean getReminderOn(){
-        return reminderOn;
-    }
 
 
-    public SharedEventItem getSharedEventListItemFromEvent(Event event){
+
+
+
+    public SharedEventListItem getSharedEventListItemFromEvent(Event event){
+        String id = event.getEventId();
         String title = event.getTitle();
         String date = event.getDate();
-        String id = event.getId();
-        return new SharedEventItem(id, title, date, Constants.WAITING);
+        String status = event.getStatus();
+        return new SharedEventListItem(id, title, date, status);
     }
 
 
-    public EventListItem getEventListItemFromEvent(Event event){
+    public PublishedEventListItem getPublishedEventListItemFromEvent(Event event){
+        String eventId = event.getEventId();
+        String userId = event.getUserId();
         String title = event.getTitle();
         String date = event.getDate();
-        return new EventListItem(title, date);
+        return new PublishedEventListItem(eventId, userId, title, date);
     }
+
+    public EntriesEventListItem getEntriesEventListItemFromEvent(Event event){
+        String eventId = event.getEventId();
+        String userId = event.getUserId();
+        String title = event.getTitle();
+        String date = event.getDate();
+        return new EntriesEventListItem(userId, eventId, title, date);
+    }
+
+
 }

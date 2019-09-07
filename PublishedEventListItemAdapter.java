@@ -9,13 +9,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class EventListItemAdapter extends ArrayAdapter<EventListItem> {
+public class PublishedEventListItemAdapter extends ArrayAdapter<PublishedEventListItem> {
 
-    private ArrayList<EventListItem> eventList;
+    private ArrayList<PublishedEventListItem> eventList;
     private Context context;
 
-    public EventListItemAdapter(Context context, ArrayList<EventListItem> eventList) {
-        super(context, R.layout.event_list_item, eventList);
+    public PublishedEventListItemAdapter(Context context, ArrayList<PublishedEventListItem> eventList) {
+        super(context, R.layout.published_event_list_item, eventList);
 
         this.eventList = eventList;
         this.context = context;
@@ -27,17 +27,17 @@ public class EventListItemAdapter extends ArrayAdapter<EventListItem> {
 
         if (v == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = layoutInflater.inflate(R.layout.event_list_item, null);
+            v = layoutInflater.inflate(R.layout.published_event_list_item, null);
         }
 
-        EventListItem eventListItem = eventList.get(position);
+        PublishedEventListItem publishedEventListItem = eventList.get(position);
 
-        if (eventListItem != null) {
+        if (publishedEventListItem != null) {
             TextView eventItemTitle = v.findViewById(R.id.title_info_textView);
             TextView eventItemDate = v.findViewById(R.id.date_textView);
 
-            eventItemTitle.setText(eventListItem.getTitle());
-            eventItemDate.setText(eventListItem.getDate());
+            eventItemTitle.setText(publishedEventListItem.getTitle());
+            eventItemDate.setText(publishedEventListItem.getDate());
         }
         return v;
     }

@@ -117,13 +117,14 @@ public class ShareEventActivity extends AppCompatActivity implements AdapterView
         String admission = admissionSpinner.getSelectedItem().toString();
 
         if(!title.isEmpty() && !date.isEmpty() && !time.isEmpty() && !place.isEmpty()){
-            Event event = new Event(id, title, date, time, place, admission, description, Constants.WAITING,false);
+            Event event = new Event(firebaseAuth.getUid(), id, title, date, time, place, admission, description, Constants.WAITING);
 
             DatabaseReference rootRef = firebaseDatabase.getReference();
-            rootRef.child(firebaseAuth.getUid()).child("Shared Events").child(event.getId()).setValue(event);
+            rootRef.child(firebaseAuth.getUid()).child("Shared Events").child(event.getEventId()).setValue(event);
             progressDialog.setMessage("Sende Event...");
             progressDialog.show();
             startActivity(new Intent(this, MainActivity.class));
+            finish();
 
 
         } else {
@@ -160,6 +161,14 @@ public class ShareEventActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        inputTime.setText(hourOfDay + ":" + minute + " Uhr");
+        if(hourOfDay < 10 && minute < 10){
+            inputTime.setText("0" + hourOfDay + ":0" + minute + " Uhr");
+        } else if(hourOfDay < 10 && minute >= 10){
+            inputTime.setText("0" + hourOfDay + ":" + minute + " Uhr");
+        } else if(hourOfDay >=10 && minute < 10){
+            inputTime.setText(hourOfDay + ":0" + minute + " Uhr");
+        } else {
+            inputTime.setText(hourOfDay + ":" + minute + " Uhr");
+        }
     }
 }

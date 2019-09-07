@@ -17,9 +17,9 @@ public class PageAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new WeekFragment();
+                return new CurrentTabFragment();
             case 1:
-                return new MonthFragment();
+                return new CalenderTabFragment();
             default:
                 return null;
         }
