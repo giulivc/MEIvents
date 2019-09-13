@@ -8,20 +8,23 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
-public class EntriesEventListItemAdapter extends ArrayAdapter<EntriesEventListItem> {
+//adapter class for displaying entries in EntriesFragment
+//adds non-functional unread dot to every list item (design attribute)
 
-    private ArrayList<EntriesEventListItem> entriesList;
+public class EntriesEventsAdapter extends ArrayAdapter<Event> {
+
+
     private Context context;
+    private ArrayList<Event> entriesList;
 
-    public EntriesEventListItemAdapter(Context context, ArrayList<EntriesEventListItem> entriesList) {
+
+    public EntriesEventsAdapter(Context context, ArrayList<Event> entriesList) {
         super(context, R.layout.entries_event_list_item, entriesList);
 
-        this.entriesList = entriesList;
         this.context = context;
+        this.entriesList = entriesList;
+
     }
 
     @Override
@@ -33,14 +36,14 @@ public class EntriesEventListItemAdapter extends ArrayAdapter<EntriesEventListIt
             v = layoutInflater.inflate(R.layout.entries_event_list_item, null);
         }
 
-        EntriesEventListItem entriesEventListItem = entriesList.get(position);
+       Event entriesEvent = entriesList.get(position);
 
-        if (entriesEventListItem != null) {
+        if (entriesEvent != null) {
             TextView entriesEventItemTitle = v.findViewById(R.id.title_entries_list_textView);
             TextView entriesEventItemDate = v.findViewById(R.id.date_entries_list_textView);
 
-            entriesEventItemTitle.setText(entriesEventListItem.getTitle());
-            entriesEventItemDate.setText(entriesEventListItem.getDate());
+            entriesEventItemTitle.setText(entriesEvent.getTitle());
+            entriesEventItemDate.setText(entriesEvent.getDate());
         }
 
         return v;

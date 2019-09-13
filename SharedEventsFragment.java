@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -25,15 +24,11 @@ import java.util.ArrayList;
 
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
-
 public class SharedEventsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-    ArrayList<SharedEventListItem> sharedEventList;
+    ArrayList<Event> sharedEventsList;
     ListView sharedEventsListView;
-    SharedEventListItemAdapter adapter;
+    SharedEventsAdapter adapter;
 
     FirebaseDatabase firebaseDatabase;
     FirebaseAuth firebaseAuth;
@@ -54,11 +49,12 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shared_events, container, false);
 
+        getActivity().setTitle("Geteilte Events");
 
-        sharedEventList = new ArrayList<>();
+        sharedEventsList = new ArrayList<>();
         sharedEventsListView = view.findViewById(R.id.sharedEventsListView);
         sharedEventsListView.setOnItemClickListener(this);
-        adapter = new SharedEventListItemAdapter(getContext(), sharedEventList);
+        adapter = new SharedEventsAdapter(getContext(), sharedEventsList);
         sharedEventsListView.setAdapter(adapter);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -69,10 +65,9 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
         childEventListener = new ChildEventListener(){
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Event event = dataSnapshot.getValue(Event.class);
-                if(event != null){
-                    SharedEventListItem newSharedEventListItem = event.getSharedEventListItemFromEvent(event);
-                    sharedEventList.add(newSharedEventListItem);
+                Event sharedEvent = dataSnapshot.getValue(Event.class);
+                if(sharedEvent != null){
+                    sharedEventsList.add(sharedEvent);
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -110,9 +105,9 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        SharedEventListItem sharedEventListItem = sharedEventList.get(position);
+        Event sharedEvent = sharedEventsList.get(position);
         sharedEventsRef = firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("Shared Events");
-        Query query = sharedEventsRef.orderByChild("eventId").equalTo(sharedEventListItem.getEventId());
+        Query query = sharedEventsRef.orderByChild("eventId").equalTo(sharedEvent.getEventId());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -121,13 +116,14 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
                         Event event = snapshot.getValue(Event.class);
 
                         Intent intent = new Intent(getActivity(), SharedEventInfoActivity.class);
-                        intent.putExtra("ID", event.getEventId());
+                        intent.putExtra("EVENTID", event.getEventId());
                         intent.putExtra("TITLE", event.getTitle());
                         intent.putExtra("DATE", event.getDate());
                         intent.putExtra("TIME", event.getTime());
                         intent.putExtra("PLACE", event.getPlace());
                         intent.putExtra("DESCR", event.getDescription());
                         intent.putExtra("STATUS", event.getStatus());
+
                         startActivity(intent);
                     }
                 }

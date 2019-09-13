@@ -1,7 +1,5 @@
 package com.example.meivents;
 
-import java.util.List;
-
 public class UserProfile {
 
     String id;

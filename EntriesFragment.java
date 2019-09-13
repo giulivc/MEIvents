@@ -2,7 +2,6 @@ package com.example.meivents;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,31 +21,25 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
+//Fragment only usable for student council members
+//showing all events that has been sent in by normal users that haven't been accepted or declined yet
 
 public class EntriesFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-    ArrayList<EntriesEventListItem> entriesList;
-    ListView entriesListView;
 
-    EntriesEventListItemAdapter adapter;
+    ArrayList<Event> entriesList;
+    ListView entriesListView;
+    EntriesEventsAdapter adapter;
 
     FirebaseDatabase firebaseDatabase;
     FirebaseAuth firebaseAuth;
-
     DatabaseReference rootRef;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -55,42 +48,42 @@ public class EntriesFragment extends Fragment implements AdapterView.OnItemClick
 
         View view = inflater.inflate(R.layout.fragment_entries, container, false);
 
-        entriesList = new ArrayList<>();
-        Collections.reverse(entriesList);
+        //sets title in actionbar
+        getActivity().setTitle("Einsendungen");
 
+        //initializes listview and adapter
+        entriesList = new ArrayList<>();
         entriesListView = view.findViewById(R.id.entriesListView);
         entriesListView.setOnItemClickListener(this);
 
-        adapter = new EntriesEventListItemAdapter(getContext(), entriesList);
+        adapter = new EntriesEventsAdapter(getContext(), entriesList);
         entriesListView.setAdapter(adapter);
 
+        //searches for every user who isn't signed in as student council member
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
-
         rootRef = firebaseDatabase.getReference();
 
-        Query noFachschaftQuery = rootRef.orderByChild("Fachschaftsmitglied").equalTo(false);
-        noFachschaftQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query noStudCouncilQuery = rootRef.orderByChild("Student Council").equalTo(false);
+        noStudCouncilQuery.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         UserProfile userProfile = snapshot.getValue(UserProfile.class);
-                        final DatabaseReference ref = rootRef.child(userProfile.getId()).child("Shared Events");
+                        DatabaseReference ref = rootRef.child(userProfile.getId()).child("Shared Events");
                         ref.addChildEventListener(new ChildEventListener() {
+
                             @Override
                             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                                final Event event = dataSnapshot.getValue(Event.class);
-                                if (event != null) {
-                                    if(event.getStatus().equals(Constants.WAITING)){
-                                        final EntriesEventListItem newEntry = event.getEntriesEventListItemFromEvent(event);
+                                Event newEntry = dataSnapshot.getValue(Event.class);
+                                if (newEntry != null) {
+                                    if(newEntry.getStatus().equals(Constants.WAITING)){
                                         entriesList.add(newEntry);
                                         adapter.notifyDataSetChanged();
                                     }
-
                                 }
-
                             }
 
                             @Override
@@ -114,11 +107,8 @@ public class EntriesFragment extends Fragment implements AdapterView.OnItemClick
                             }
                         });
                     }
-
                 }
-
             }
-
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -126,8 +116,6 @@ public class EntriesFragment extends Fragment implements AdapterView.OnItemClick
             }
 
         });
-
-
 
         return view;
     }
@@ -137,38 +125,20 @@ public class EntriesFragment extends Fragment implements AdapterView.OnItemClick
         entriesListView = getView().findViewById(R.id.entriesListView);
     }
 
+    //opens HandleEntryActivity when clicking item to accept or decline entry
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        EntriesEventListItem entriesEventListItem = entriesList.get(position);
-        System.out.println(entriesEventListItem.getUserId());
+        Event entriesEvent = entriesList.get(position);
 
-        DatabaseReference eventRef = rootRef.child(entriesEventListItem.getUserId()).child("Shared Events");
-        Query query = eventRef.orderByChild("eventId").equalTo(entriesEventListItem.getEventId());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Event event = snapshot.getValue(Event.class);
+        Intent intent = new Intent(getActivity(), HandleEntryActivity.class);
+        intent.putExtra("USERID", entriesEvent.getUserId());
+        intent.putExtra("EVENTID", entriesEvent.getEventId());
+        intent.putExtra("TITLE", entriesEvent.getTitle());
+        intent.putExtra("DATE", entriesEvent.getDate());
+        intent.putExtra("TIME", entriesEvent.getTime());
+        intent.putExtra("PLACE", entriesEvent.getPlace());
+        intent.putExtra("DESCR", entriesEvent.getDescription());
 
-                        Intent intent = new Intent(getActivity(), HandleEntryActivity.class);
-                        intent.putExtra("USERID", event.getUserId());
-                        intent.putExtra("EVENTID", event.getEventId());
-                        intent.putExtra("TITLE", event.getTitle());
-                        intent.putExtra("DATE", event.getDate());
-                        intent.putExtra("TIME", event.getTime());
-                        intent.putExtra("PLACE", event.getPlace());
-                        intent.putExtra("DESCR", event.getDescription());
-
-                        startActivity(intent);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        startActivity(intent);
     }
 }

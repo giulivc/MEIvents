@@ -30,6 +30,7 @@ public class StudentCouncilLoginFragment extends Fragment implements View.OnClic
 
     FirebaseDatabase firebaseDatabase;
     FirebaseAuth firebaseAuth;
+    DatabaseReference rootRef;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,9 +42,14 @@ public class StudentCouncilLoginFragment extends Fragment implements View.OnClic
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_student_council_login, container, false);
 
+        getActivity().setTitle("Fachschafts-Login");
         codeConfirmButton = view.findViewById(R.id.codeConfirmButton);
         codeConfirmButton.setOnClickListener(this);
         codeInputEditText = view.findViewById(R.id.code_editText);
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        rootRef = firebaseDatabase.getReference();
 
         return view;
     }
@@ -52,17 +58,15 @@ public class StudentCouncilLoginFragment extends Fragment implements View.OnClic
     @Override
     public void onClick(View v) {
         checkAccessCode();
+
     }
 
     private void checkAccessCode(){
         String input = codeInputEditText.getText().toString();
         if(input.equals(Constants.ACCESS_CODE)) {
-            Intent i = new Intent(getContext(), LoginSuccessfulActivity.class);
+            Intent i = new Intent(getContext(), AuthorizationSuccessfulActivity.class);
             startActivity(i);
-            firebaseDatabase = FirebaseDatabase.getInstance();
-            firebaseAuth = FirebaseAuth.getInstance();
-            DatabaseReference rootRef = firebaseDatabase.getReference();
-            rootRef.child(firebaseAuth.getUid()).child("Fachschaftsmitglied").setValue(true);
+            rootRef.child(firebaseAuth.getUid()).child("Student Council").setValue(true);
 
         } else {
             Toast.makeText(getContext(), "Falscher Zugangscode! Versuch es nochmal!", Toast.LENGTH_SHORT).show();

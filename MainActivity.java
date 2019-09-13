@@ -21,8 +21,9 @@ import com.google.firebase.database.ValueEventListener;
 
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+//implements fundamental navigation trough app with burger menu
 
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     Toolbar toolbar;
     DrawerLayout drawer;
@@ -30,9 +31,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     FirebaseDatabase firebaseDatabase;
     FirebaseAuth firebaseAuth;
-
-    DatabaseReference fachschaftRef;
-
+    DatabaseReference rootRef;
+    DatabaseReference studCouncilRef;
 
 
 
@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -53,24 +52,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new EventCalenderFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new EventCalendarFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_event_calender);
         }
 
         navigationView.getMenu().findItem(R.id.nav_entries).setEnabled(false);
 
+        //listens for user changing to student council member to disable menu item "Fachschafts-Login" and enable "Einsendungen"
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
-        DatabaseReference rootRef = firebaseDatabase.getReference();
-        fachschaftRef = rootRef.child(firebaseAuth.getUid()).child("Fachschaftsmitglied");
+        rootRef = firebaseDatabase.getReference();
 
-        fachschaftRef.addValueEventListener(new ValueEventListener() {
+        studCouncilRef = rootRef.child(firebaseAuth.getUid()).child("Student Council");
+        studCouncilRef.addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Boolean isFachschaft = dataSnapshot.getValue(Boolean.class);
-                if(isFachschaft) {
+                Boolean isStudCouncil = dataSnapshot.getValue(Boolean.class);
+                if(isStudCouncil) {
                     navigationView.getMenu().findItem(R.id.nav_login).setEnabled(false);
                     navigationView.getMenu().findItem(R.id.nav_entries).setEnabled(true);
                 }
@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-
     }
 
     @Override
@@ -90,16 +89,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)){
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            finishAffinity();
         }
-
     }
+
+
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()){
             case R.id.nav_event_calender:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new EventCalenderFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new EventCalendarFragment()).commit();
                 break;
             case R.id.nav_shared_events:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SharedEventsFragment()).commit();
@@ -120,6 +120,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
 
 }

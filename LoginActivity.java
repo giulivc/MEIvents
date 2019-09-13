@@ -16,38 +16,45 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+
+//Activity for logging in after registration and email verification
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     EditText inputEmail, inputPassword;
     Button signInButton;
+
     TextView signUpTextView;
     TextView forgotPwTextView;
     FirebaseAuth firebaseAuth;
 
     ProgressDialog progressDialog;
 
-    private FirebaseAuth.AuthStateListener authStateListener;
+    FirebaseAuth.AuthStateListener authStateListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        firebaseAuth = FirebaseAuth.getInstance();
         inputEmail = findViewById(R.id.login_email_editText);
         inputPassword = findViewById(R.id.login_password_editText);
+
         signInButton = findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener(this);
+
+        //by clicking starts RegisterActivity
         signUpTextView = findViewById(R.id.sign_up_textView);
         signUpTextView.setOnClickListener(this);
+
+        //by clicking starts ForgotPasswordActivity
         forgotPwTextView = findViewById(R.id.forgot_pw_textView);
         forgotPwTextView.setOnClickListener(this);
 
-        progressDialog = new ProgressDialog(this);
+        firebaseAuth = FirebaseAuth.getInstance();
 
+        //makes sure that user doesn't have to log in every time opening application
+        //automatically starts MainActivity if user is registered and email verified
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -60,6 +67,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
         };
+
+        progressDialog = new ProgressDialog(this);
     }
 
 
@@ -70,20 +79,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String email = inputEmail.getText().toString();
                 String password = inputPassword.getText().toString();
                 if(!email.isEmpty() && !password.isEmpty()){
-                    progressDialog.setMessage("Anmeldung erfolgt...");
-                    progressDialog.show();
-
-                    firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(!task.isSuccessful()){
-                                Toast.makeText(LoginActivity.this, "Anmeldung fehlgeschlagen!", Toast.LENGTH_SHORT).show();
-                            } else {
-                                checkEmailVerification();
-                            }
-                            progressDialog.dismiss();
-                        }
-                    });
+                    signInWith(email, password);
                 } else {
                     Toast.makeText(this, "Bitte fülle alle Felder aus!", Toast.LENGTH_SHORT).show();
                 }
@@ -99,12 +95,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        firebaseAuth.addAuthStateListener(authStateListener);
-    }
 
+    private void signInWith(String email, String password){
+        progressDialog.setMessage("Anmeldung erfolgt...");
+        progressDialog.show();
+
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(!task.isSuccessful()){
+                    Toast.makeText(LoginActivity.this, "Anmeldung fehlgeschlagen!", Toast.LENGTH_SHORT).show();
+                } else {
+                    checkEmailVerification();
+                }
+                progressDialog.dismiss();
+            }
+        });
+    }
 
     public void checkEmailVerification(){
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
@@ -121,4 +128,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        firebaseAuth.addAuthStateListener(authStateListener);
+    }
+
+    //makes sure that user isn't able to go back to application after logging out without logging in again
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
+    }
 }

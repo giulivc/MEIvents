@@ -27,7 +27,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.UUID;
 
-public class ShareEventActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+public class ShareEventActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     Spinner admissionSpinner;
     ArrayAdapter<CharSequence> adapter;
@@ -58,7 +58,6 @@ public class ShareEventActivity extends AppCompatActivity implements AdapterView
         adapter = ArrayAdapter.createFromResource(this, R.array.admissions, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         admissionSpinner.setAdapter(adapter);
-        admissionSpinner.setOnItemSelectedListener(this);
 
         inputTitle = findViewById(R.id.title_editText);
         inputDate = findViewById(R.id.date_editText);
@@ -81,16 +80,6 @@ public class ShareEventActivity extends AppCompatActivity implements AdapterView
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-    }
-
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.date_editText:
@@ -100,7 +89,8 @@ public class ShareEventActivity extends AppCompatActivity implements AdapterView
                 createTimePickerDialog().show();
                 break;
             case R.id.send_button:
-                    addEvent();
+                addEvent();
+                break;
         }
 
 
@@ -125,7 +115,6 @@ public class ShareEventActivity extends AppCompatActivity implements AdapterView
             progressDialog.show();
             startActivity(new Intent(this, MainActivity.class));
             finish();
-
 
         } else {
             Toast.makeText(this, "Bitte fülle alle Pflichtfelder aus!", Toast.LENGTH_SHORT).show();
