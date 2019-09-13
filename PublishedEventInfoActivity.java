@@ -112,7 +112,7 @@ public class PublishedEventInfoActivity extends AppCompatActivity implements Swi
                 Event event = dataSnapshot.getValue(Event.class);
                 if(PendingIntent.getBroadcast(getApplicationContext(), event.getEventId().hashCode(),
                         new Intent(getApplicationContext(), AlarmReceiver.class),
-                        PendingIntent.FLAG_UPDATE_CURRENT) == null){
+                        PendingIntent.FLAG_NO_CREATE) == null){
                     setAlarm(event.getEventId(), event.getTitle(), event.getDate(), event.getTime());
                 }
             }
@@ -195,6 +195,7 @@ public class PublishedEventInfoActivity extends AppCompatActivity implements Swi
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
+        pendingIntent.cancel();
 
     }
 
