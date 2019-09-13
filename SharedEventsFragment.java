@@ -22,7 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-
+//Fragment showing all events the user sent in with information about processing status
 
 public class SharedEventsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
@@ -32,16 +32,12 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
 
     FirebaseDatabase firebaseDatabase;
     FirebaseAuth firebaseAuth;
-
     DatabaseReference rootRef;
     DatabaseReference sharedEventsRef;
-
-    ChildEventListener childEventListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -49,20 +45,25 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shared_events, container, false);
 
+        //sets title in actionbar
         getActivity().setTitle("Geteilte Events");
 
+        //initializes listview and adapter
         sharedEventsList = new ArrayList<>();
+
         sharedEventsListView = view.findViewById(R.id.sharedEventsListView);
         sharedEventsListView.setOnItemClickListener(this);
+
         adapter = new SharedEventsAdapter(getContext(), sharedEventsList);
         sharedEventsListView.setAdapter(adapter);
 
+        //retrieves all events user sent in from database and adds to arraylist
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseAuth  = FirebaseAuth.getInstance();
         rootRef = firebaseDatabase.getReference();
-        sharedEventsRef = rootRef.child(firebaseAuth.getUid()).child("Shared Events");
 
-        childEventListener = new ChildEventListener(){
+        sharedEventsRef = rootRef.child(firebaseAuth.getUid()).child("Shared Events");
+        sharedEventsRef.addChildEventListener(new ChildEventListener(){
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Event sharedEvent = dataSnapshot.getValue(Event.class);
@@ -91,9 +92,7 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        };
-
-        sharedEventsRef.addChildEventListener(childEventListener);
+        });
 
         return view;
     }
@@ -103,36 +102,20 @@ public class SharedEventsFragment extends Fragment implements AdapterView.OnItem
         sharedEventsListView = getView().findViewById(R.id.sharedEventsListView);
     }
 
+
+    //opens SharedEventInfoActivity when clicking item to see all information about event
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Event sharedEvent = sharedEventsList.get(position);
-        sharedEventsRef = firebaseDatabase.getReference().child(firebaseAuth.getUid()).child("Shared Events");
-        Query query = sharedEventsRef.orderByChild("eventId").equalTo(sharedEvent.getEventId());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Event event = snapshot.getValue(Event.class);
+        Intent intent = new Intent(getActivity(), SharedEventInfoActivity.class);
+        intent.putExtra("EVENTID", sharedEvent.getEventId());
+        intent.putExtra("TITLE", sharedEvent.getTitle());
+        intent.putExtra("DATE", sharedEvent.getDate());
+        intent.putExtra("TIME", sharedEvent.getTime());
+        intent.putExtra("PLACE", sharedEvent.getPlace());
+        intent.putExtra("DESCR", sharedEvent.getDescription());
+        intent.putExtra("STATUS", sharedEvent.getStatus());
 
-                        Intent intent = new Intent(getActivity(), SharedEventInfoActivity.class);
-                        intent.putExtra("EVENTID", event.getEventId());
-                        intent.putExtra("TITLE", event.getTitle());
-                        intent.putExtra("DATE", event.getDate());
-                        intent.putExtra("TIME", event.getTime());
-                        intent.putExtra("PLACE", event.getPlace());
-                        intent.putExtra("DESCR", event.getDescription());
-                        intent.putExtra("STATUS", event.getStatus());
-
-                        startActivity(intent);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        startActivity(intent);
     }
 }

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -27,16 +26,19 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.UUID;
 
-public class ShareEventActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+//Activity to sent in events to student council members (found in EntriesFragment)
+//provides fields for each necessary or optional information about event
 
-    Spinner admissionSpinner;
-    ArrayAdapter<CharSequence> adapter;
+public class ShareEventActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     EditText inputTitle;
     EditText inputDate;
     EditText inputTime;
     EditText inputPlace;
     EditText inputDescription;
+
+    Spinner admissionSpinner;
+    ArrayAdapter<CharSequence> adapter;
 
     Button sendButton;
 
@@ -51,15 +53,8 @@ public class ShareEventActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_event);
 
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseAuth = FirebaseAuth.getInstance();
-
-        admissionSpinner = findViewById(R.id.admission_spinner);
-        adapter = ArrayAdapter.createFromResource(this, R.array.admissions, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        admissionSpinner.setAdapter(adapter);
-
         inputTitle = findViewById(R.id.title_editText);
+
         inputDate = findViewById(R.id.date_editText);
         inputDate.setFocusable(false);
         inputDate.setOnClickListener(this);
@@ -69,14 +64,22 @@ public class ShareEventActivity extends AppCompatActivity implements View.OnClic
         inputTime.setOnClickListener(this);
 
         inputPlace = findViewById(R.id.place_editText);
+
+        //implements spinner to select admission
+        admissionSpinner = findViewById(R.id.admission_spinner);
+        adapter = ArrayAdapter.createFromResource(this, R.array.admissions, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        admissionSpinner.setAdapter(adapter);
+
         inputDescription = findViewById(R.id.description_editText);
 
         sendButton = findViewById(R.id.send_button);
         sendButton.setOnClickListener(this);
 
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+
         progressDialog = new ProgressDialog(this);
-
-
     }
 
     @Override
@@ -92,11 +95,52 @@ public class ShareEventActivity extends AppCompatActivity implements View.OnClic
                 addEvent();
                 break;
         }
-
-
-
     }
 
+    //creates graphical calendar to pick a date
+    private DatePickerDialog createDatePickerDialog() {
+        GregorianCalendar today = new GregorianCalendar();
+        int day = today.get(Calendar.DAY_OF_MONTH);
+        int month = today.get(Calendar.MONTH);
+        int year = today.get(Calendar.YEAR);
+
+        return new DatePickerDialog(this, this, year, month, day);
+    }
+
+    //sets date as string in inputDate field
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        GregorianCalendar date = new GregorianCalendar(year, month, dayOfMonth);
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT,
+                Locale.GERMANY);
+        String dateString = df.format(date.getTime());
+        inputDate.setText(dateString);
+    }
+
+    //creates graphical clock to pick a time
+    private TimePickerDialog createTimePickerDialog() {
+        GregorianCalendar calendar = new GregorianCalendar();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int min = calendar.get(Calendar.MINUTE);
+
+        return new TimePickerDialog(this, this, hour, min, true);
+    }
+
+    //sets date as string in inputTime field
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        if(hourOfDay < 10 && minute < 10){
+            inputTime.setText("0" + hourOfDay + ":0" + minute + " Uhr");
+        } else if(hourOfDay < 10 && minute >= 10){
+            inputTime.setText("0" + hourOfDay + ":" + minute + " Uhr");
+        } else if(hourOfDay >=10 && minute < 10){
+            inputTime.setText(hourOfDay + ":0" + minute + " Uhr");
+        } else {
+            inputTime.setText(hourOfDay + ":" + minute + " Uhr");
+        }
+    }
+
+    //adds event to database with status WAITING to be shown in SharedEventFragment and EntriesFragment
     private void addEvent(){
         String id = UUID.randomUUID().toString();
         String title = inputTitle.getText().toString();
@@ -118,46 +162,6 @@ public class ShareEventActivity extends AppCompatActivity implements View.OnClic
 
         } else {
             Toast.makeText(this, "Bitte fülle alle Pflichtfelder aus!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private DatePickerDialog createDatePickerDialog() {
-        GregorianCalendar today = new GregorianCalendar();
-        int day = today.get(Calendar.DAY_OF_MONTH);
-        int month = today.get(Calendar.MONTH);
-        int year = today.get(Calendar.YEAR);
-
-        return new DatePickerDialog(this, this, year, month, day);
-    }
-
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        GregorianCalendar date = new GregorianCalendar(year, month, dayOfMonth);
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT,
-                Locale.GERMANY);
-        String dateString = df.format(date.getTime());
-        inputDate.setText(dateString);
-    }
-
-    private TimePickerDialog createTimePickerDialog() {
-        GregorianCalendar calendar = new GregorianCalendar();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int min = calendar.get(Calendar.MINUTE);
-
-        return new TimePickerDialog(this, this, hour, min, true);
-    }
-
-    @Override
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        if(hourOfDay < 10 && minute < 10){
-            inputTime.setText("0" + hourOfDay + ":0" + minute + " Uhr");
-        } else if(hourOfDay < 10 && minute >= 10){
-            inputTime.setText("0" + hourOfDay + ":" + minute + " Uhr");
-        } else if(hourOfDay >=10 && minute < 10){
-            inputTime.setText(hourOfDay + ":0" + minute + " Uhr");
-        } else {
-            inputTime.setText(hourOfDay + ":" + minute + " Uhr");
         }
     }
 }

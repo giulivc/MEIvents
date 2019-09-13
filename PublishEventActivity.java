@@ -115,7 +115,7 @@ public class PublishEventActivity extends AppCompatActivity implements View.OnCl
         inputDate.setText(dateString);
     }
 
-    //creates graphical clock to pick a date
+    //creates graphical clock to pick a time
     private TimePickerDialog createTimePickerDialog() {
         GregorianCalendar calendar = new GregorianCalendar();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -124,7 +124,7 @@ public class PublishEventActivity extends AppCompatActivity implements View.OnCl
         return new TimePickerDialog(this, this, hour, min, true);
     }
 
-    //sets date as string in inputDate field
+    //sets date as string in inputTime field
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         if(hourOfDay < 10 && minute < 10){

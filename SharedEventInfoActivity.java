@@ -43,7 +43,12 @@ public class SharedEventInfoActivity extends AppCompatActivity {
         descrTextView = findViewById(R.id.descr_shared_textView);
 
         Bundle extras = getIntent().getExtras();
-
+        eventId = extras.getString("EVENTID");
+        title = extras.getString("TITLE");
+        date = extras.getString("DATE");
+        time = extras.getString("TIME");
+        place = extras.getString("PLACE");
+        descr = extras.getString("DESCR");
         status = extras.getString("STATUS");
 
         //retrieves data about status from database to set status imageview and textview
@@ -63,19 +68,13 @@ public class SharedEventInfoActivity extends AppCompatActivity {
             }
         });
 
-        eventId = extras.getString("EVENTID");
-        title = extras.getString("TITLE");
-        date = extras.getString("DATE");
-        time = extras.getString("TIME");
-        place = extras.getString("PLACE");
-        descr = extras.getString("DESCR");
-
         titleTextView.setText(title);
         dateTextView.setText(date);
         timeTextView.setText(time);
         placeTextView.setText(place);
         setDescrTextView(descr);
     }
+
 
     private void setStatusInfo(String status, String declineReason){
         switch (status) {

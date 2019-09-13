@@ -348,7 +348,7 @@ public class AllEventsFragment extends Fragment implements AdapterView.OnItemCli
         startActivity(intent);
     }
 
-    //adds event to TaggedEventsFragment on long click
+    //adds event to TaggedEventsFragment and to database under "Tagged Events" on long click
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, final View view, int position, long id) {
         Event taggedEvent = acceptedEventsList.get(position);
@@ -364,6 +364,10 @@ public class AllEventsFragment extends Fragment implements AdapterView.OnItemCli
 
     private boolean isToday(Date date){
         Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
 
         Date today = calendar.getTime();
         return !date.after(today) && !date.before(today);
